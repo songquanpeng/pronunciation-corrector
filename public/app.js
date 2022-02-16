@@ -119,6 +119,14 @@ async function onSelectVocabularyChange() {
   localStorage.setItem('vocabularyName', vocabularyName);
 }
 
+function onRepeatNumberChange() {
+  repeatNumber = parseInt(document.getElementById("repeatNumber").value);
+}
+
+function onIntervalChange() {
+  interval = parseInt(document.getElementById("interval").value);
+}
+
 function resetProgress() {
   vocabulary.progress = 0;
 }
