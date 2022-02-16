@@ -90,7 +90,7 @@ async function play() {
 
   let word = vocabulary.words[vocabulary.progress].word;
   if (remainingRepeatNumber === repeatNumber) {
-    currentWord.value = word;
+    currentWord.innerText = word;
     source.setAttribute('src', `https://dict.youdao.com/dictvoice?type=${type}&audio=${word}`);
     await player.load();
   }

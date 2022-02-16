@@ -254,3 +254,7 @@ span.line {
 .footer {
     padding: 3rem 1.5rem;
 }
+
+#currentWord {
+    font-size: x-large;
+}
