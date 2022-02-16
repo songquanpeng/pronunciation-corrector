@@ -8,10 +8,12 @@ let isPlaying = false;
 let type = 0;
 let switched = false;
 let vocabulary;
-let vocabularyName = "common-3000";
+let vocabularyName = null;
+let vocabularies;
 let repeatNumber;
 let remainingRepeatNumber;
 let interval;
+let selectVocabularyElement;
 
 document.addEventListener('DOMContentLoaded', function () {
   init();
@@ -23,12 +25,31 @@ async function init() {
   currentWord = document.getElementById("currentWord");
   source = document.getElementById("source");
   player = document.getElementById("player");
+  selectVocabularyElement = document.getElementById('selectVocabulary');
   repeatNumber = parseInt(document.getElementById("repeatNumber").value);
   interval = parseInt(document.getElementById("interval").value);
   remainingRepeatNumber = repeatNumber;
-  vocabulary = await loadVocabulary(vocabularyName);
+  vocabularies = await loadVocabularies();
+  vocabularyName = localStorage.getItem('vocabularyName');
+  if (vocabularyName) {
+    selectVocabularyElement.value = vocabularyName;
+    vocabulary = await loadVocabulary(vocabularyName);
+  }
 
   player.addEventListener("ended", playEnded);
+}
+
+
+async function loadVocabularies() {
+  let res = await fetch(`config.json`);
+  let vocabularies = await res.json();
+  let html = ""
+  for (const [key, value] of Object.entries(vocabularies)) {
+    console.log(`${key}: ${value}`);
+    html += `<option value="${key}">${value}</option>`
+  }
+  selectVocabularyElement.innerHTML = html;
+  return vocabularies;
 }
 
 
@@ -63,6 +84,10 @@ function switchType() {
 }
 
 async function play() {
+  if (vocabularyName === null) {
+    await onSelectVocabularyChange();
+  }
+
   let word = vocabulary.words[vocabulary.progress].word;
   if (remainingRepeatNumber === repeatNumber) {
     currentWord.value = word;
@@ -83,4 +108,15 @@ async function playEnded() {
     localStorage.setItem(`vocabulary-${vocabularyName}`, JSON.stringify(vocabulary));
   }
   setTimeout(play, interval);
+}
+
+
+async function onSelectVocabularyChange() {
+  vocabularyName = selectVocabularyElement.value;
+  vocabulary = await loadVocabulary(vocabularyName);
+  localStorage.setItem('vocabularyName', vocabularyName);
+}
+
+function resetProgress() {
+  vocabulary.progress = 0;
 }
