@@ -71,6 +71,7 @@ function playBtnClicked() {
     shouldStop = true;
   } else {
     playBtn.textContent = "停止";
+    shouldStop = false;
     play();
   }
   isPlaying = !isPlaying;
@@ -84,6 +85,7 @@ function switchType() {
 }
 
 async function play() {
+  if (shouldStop) return;
   if (vocabularyName === null) {
     await onSelectVocabularyChange();
   }
@@ -119,4 +121,9 @@ async function onSelectVocabularyChange() {
 
 function resetProgress() {
   vocabulary.progress = 0;
+}
+
+function back() {
+  vocabulary.progress -= 2;
+  if (vocabulary.progress < 0) vocabulary.progress = 0;
 }
