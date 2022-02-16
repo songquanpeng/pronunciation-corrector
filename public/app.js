@@ -14,6 +14,7 @@ let repeatNumber;
 let remainingRepeatNumber;
 let interval;
 let selectVocabularyElement;
+let progressBar;
 
 document.addEventListener('DOMContentLoaded', function () {
   init();
@@ -25,6 +26,7 @@ async function init() {
   currentWord = document.getElementById("currentWord");
   source = document.getElementById("source");
   player = document.getElementById("player");
+  progressBar = document.getElementById('progressBar');
   selectVocabularyElement = document.getElementById('selectVocabulary');
   repeatNumber = parseInt(localStorage.getItem('repeatNumber'));
   if (!repeatNumber) {
@@ -118,6 +120,8 @@ async function playEnded() {
       vocabulary.progress = 0;
     }
     localStorage.setItem(`vocabulary-${vocabularyName}`, JSON.stringify(vocabulary));
+    progressBar.value = vocabulary.progress;
+    progressBar.max = vocabulary.words.length;
   }
   setTimeout(play, interval);
 }
