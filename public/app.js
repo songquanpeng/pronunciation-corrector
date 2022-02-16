@@ -26,9 +26,19 @@ async function init() {
   source = document.getElementById("source");
   player = document.getElementById("player");
   selectVocabularyElement = document.getElementById('selectVocabulary');
-  repeatNumber = parseInt(document.getElementById("repeatNumber").value);
-  interval = parseInt(document.getElementById("interval").value);
+  repeatNumber = parseInt(localStorage.getItem('repeatNumber'));
+  if (!repeatNumber) {
+    repeatNumber = 1;
+    localStorage.setItem('repeatNumber', repeatNumber);
+  }
+  document.getElementById("repeatNumber").value = repeatNumber;
   remainingRepeatNumber = repeatNumber;
+  interval = parseInt(localStorage.getItem('interval'));
+  if (!interval) {
+    interval = 100;
+    localStorage.setItem('interval', interval);
+  }
+  document.getElementById("interval").value = interval;
   vocabularies = await loadVocabularies();
   vocabularyName = localStorage.getItem('vocabularyName');
   if (vocabularyName) {
@@ -121,10 +131,12 @@ async function onSelectVocabularyChange() {
 
 function onRepeatNumberChange() {
   repeatNumber = parseInt(document.getElementById("repeatNumber").value);
+  localStorage.setItem('repeatNumber', repeatNumber);
 }
 
 function onIntervalChange() {
   interval = parseInt(document.getElementById("interval").value);
+  localStorage.setItem('interval', interval);
 }
 
 function resetProgress() {
