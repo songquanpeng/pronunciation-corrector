@@ -15,6 +15,7 @@ let remainingRepeatNumber;
 let interval;
 let selectVocabularyElement;
 let progressBar;
+let delay;
 
 document.addEventListener('DOMContentLoaded', function () {
   init();
@@ -41,6 +42,12 @@ async function init() {
     localStorage.setItem('interval', interval);
   }
   document.getElementById("interval").value = interval;
+  delay = parseInt(localStorage.getItem('delay'));
+  if (!delay) {
+    delay = 0;
+    localStorage.setItem('delay', delay);
+  }
+  document.getElementById("delay").value = delay;
   vocabularies = await loadVocabularies();
   vocabularyName = localStorage.getItem('vocabularyName');
   if (vocabularyName) {
@@ -107,6 +114,7 @@ async function play() {
     currentWord.innerText = word;
     source.setAttribute('src', `https://dict.youdao.com/dictvoice?type=${type}&audio=${word}`);
     await player.load();
+    await new Promise(resolve => setTimeout(resolve, delay));
   }
   await player.play();
   remainingRepeatNumber--;
@@ -141,6 +149,11 @@ function onRepeatNumberChange() {
 function onIntervalChange() {
   interval = parseInt(document.getElementById("interval").value);
   localStorage.setItem('interval', interval);
+}
+
+function onDelayChange() {
+  delay = parseInt(document.getElementById("delay").value);
+  localStorage.setItem('delay', delay);
 }
 
 function resetProgress() {

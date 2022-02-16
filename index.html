@@ -96,12 +96,25 @@
                             <label class="label">控制面板</label>
                             <div class="control">
                                 <label class="checkbox" style="margin-right: 16px;">
-                                    复读次数：<span><input class="input" id="repeatNumber" type="number" value="3"
-                                                      style="height: 25px; width: 60px" onchange="onRepeatNumberChange()"></span>
+                                    复读次数：<span><input class="input" id="repeatNumber" type="number" value="3" min="0"
+                                                      style="height: 25px; width: 80px"
+                                                      onchange="onRepeatNumberChange()"></span>
                                 </label>
                                 <label class="checkbox" style="margin-right: 16px;">
-                                    复读间隔：<span><input class="input" id="interval" type="number" value="100" step="10"
-                                                      style="height: 25px; width: 70px" onchange="onIntervalChange()"></span>
+                                    复读间隔：<span><input class="input" id="interval" type="number" value="100" min="0"
+                                                      step="10"
+                                                      style="height: 25px; width: 80px"
+                                                      onchange="onIntervalChange()"></span>
+                                </label>
+                                <br>
+                                <label class="checkbox" style="margin-right: 16px;">
+                                    发音延时：<span><input class="input"
+                                                      id="delay"
+                                                      type="number"
+                                                      value="0" min="0"
+                                                      step="100"
+                                                      style="height: 25px; width: 80px"
+                                                      onchange="onDelayChange()"></span>
                                 </label>
                                 <!--                        <label class="checkbox">-->
                                 <!--                            <input type="checkbox"> 跟读-->
