@@ -285,6 +285,7 @@ span.line {
     }
 
     .panel-item > span > input {
-        width: 50px!important;
+        width: 60px!important;
+        font-size: smaller;
     }
 }
