@@ -74,7 +74,7 @@
                     <div class="column">
                         <div class="field">
                             <label class="label">当前单词</label>
-                            <div style="height: 80%; max-height: 200px; display: flex;align-items: center;justify-content: center;">
+                            <div id="currentWordContainer">
                                 <p id="currentWord" style="margin: auto">请点击播放按钮...</p>
                             </div>
                             <progress id="progressBar" class="progress is-primary" value="0" max="100"></progress>
@@ -93,21 +93,33 @@
                         </div>
 
                         <div class="field">
+                            <label class="label">当前音源</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select id="whichVoice" onchange="onWhichVoiceChange()">
+                                        <option value="youdao">有道</option>
+                                        <option value="google">Google</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="field">
                             <label class="label">控制面板</label>
                             <div class="control">
-                                <label class="checkbox" style="margin-right: 16px;">
+                                <label class="checkbox panel-item">
                                     复读次数：<span><input class="input" id="repeatNumber" type="number" value="3" min="0"
                                                       style="height: 25px; width: 80px"
                                                       onchange="onRepeatNumberChange()"></span>
                                 </label>
-                                <label class="checkbox" style="margin-right: 16px;">
+                                <label class="checkbox panel-item">
                                     复读间隔：<span><input class="input" id="interval" type="number" value="100" min="0"
                                                       step="10"
                                                       style="height: 25px; width: 80px"
                                                       onchange="onIntervalChange()"></span>
                                 </label>
                                 <br>
-                                <label class="checkbox" style="margin-right: 16px;">
+                                <label class="checkbox panel-item">
                                     发音延时：<span><input class="input"
                                                       id="delay"
                                                       type="number"
@@ -115,6 +127,15 @@
                                                       step="100"
                                                       style="height: 25px; width: 80px"
                                                       onchange="onDelayChange()"></span>
+                                </label>
+                                <label class="checkbox panel-item">
+                                    超时设置：<span><input class="input"
+                                                      id="timeout"
+                                                      type="number"
+                                                      value="0" min="1000"
+                                                      step="100"
+                                                      style="height: 25px; width: 80px"
+                                                      onchange="onTimeoutChange()"></span>
                                 </label>
                                 <!--                        <label class="checkbox">-->
                                 <!--                            <input type="checkbox"> 跟读-->

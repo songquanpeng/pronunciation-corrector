@@ -5,7 +5,7 @@ let source;
 let player;
 let shouldStop = false;
 let isPlaying = false;
-let type = 0;
+let type = 0;  // 0 means us, 1 means uk
 let switched = false;
 let vocabulary;
 let vocabularyName = null;
@@ -16,6 +16,9 @@ let interval;
 let selectVocabularyElement;
 let progressBar;
 let delay;
+let whichVoice;
+let skipTimeout;
+let timeout;
 
 document.addEventListener('DOMContentLoaded', function () {
   init();
@@ -29,6 +32,12 @@ async function init() {
   player = document.getElementById("player");
   progressBar = document.getElementById('progressBar');
   selectVocabularyElement = document.getElementById('selectVocabulary');
+  whichVoice = localStorage.getItem('whichVoice');
+  if (!whichVoice) {
+    whichVoice = "youdao";
+    localStorage.setItem("whichVoice", whichVoice);
+  }
+  document.getElementById('whichVoice').value = whichVoice;
   repeatNumber = parseInt(localStorage.getItem('repeatNumber'));
   if (!repeatNumber) {
     repeatNumber = 1;
@@ -48,6 +57,12 @@ async function init() {
     localStorage.setItem('delay', delay);
   }
   document.getElementById("delay").value = delay;
+  timeout = parseInt(localStorage.getItem('timeout'));
+  if (!timeout) {
+    timeout = 3000;
+    localStorage.setItem('timeout', timeout);
+  }
+  document.getElementById("timeout").value = timeout;
   vocabularies = await loadVocabularies();
   vocabularyName = localStorage.getItem('vocabularyName');
   if (vocabularyName) {
@@ -88,12 +103,13 @@ function playBtnClicked() {
   if (isPlaying) {
     playBtn.textContent = "播放";
     shouldStop = true;
+    isPlaying = !isPlaying;
   } else {
     playBtn.textContent = "停止";
     shouldStop = false;
+    isPlaying = !isPlaying;
     play();
   }
-  isPlaying = !isPlaying;
 }
 
 function switchType() {
@@ -112,16 +128,18 @@ async function play() {
   let word = vocabulary.words[vocabulary.progress].word;
   if (remainingRepeatNumber === repeatNumber) {
     currentWord.innerText = word;
-    source.setAttribute('src', `https://dict.youdao.com/dictvoice?type=${type}&audio=${word}`);
+    source.setAttribute('src', getAudioURL(word));
     await player.load();
     await new Promise(resolve => setTimeout(resolve, delay));
   }
-  await player.play();
   remainingRepeatNumber--;
+  skipTimeout = setTimeout(playEnded, timeout);
+  await player.play();  // if the player failed to load the audio, it will block here.
 }
 
 async function playEnded() {
-  if (remainingRepeatNumber === 0) {
+  if (skipTimeout) clearTimeout(skipTimeout);
+  if (remainingRepeatNumber <= 0) {
     remainingRepeatNumber = repeatNumber;
     vocabulary.progress++;
     if (vocabulary.progress === vocabulary.words.length) {
@@ -139,6 +157,11 @@ async function onSelectVocabularyChange() {
   vocabularyName = selectVocabularyElement.value;
   vocabulary = await loadVocabulary(vocabularyName);
   localStorage.setItem('vocabularyName', vocabularyName);
+}
+
+function onWhichVoiceChange() {
+  whichVoice = document.getElementById('whichVoice').value;
+  localStorage.setItem('whichVoice', whichVoice);
 }
 
 function onRepeatNumberChange() {
@@ -163,4 +186,24 @@ function resetProgress() {
 function back() {
   vocabulary.progress -= 2;
   if (vocabulary.progress < 0) vocabulary.progress = 0;
+}
+
+function getAudioURL(word) {
+  let url;
+  switch(whichVoice) {
+    case "google":
+      let typeStr = type === 0 ? "us" : "gb";
+      word = word.toLowerCase();
+      url = `https://ssl.gstatic.com/dictionary/static/sounds/oxford/${word}--_${typeStr}_1.mp3`;
+      break;
+    default:
+      url = `https://dict.youdao.com/dictvoice?type=${type}&audio=${word}`;
+      break;
+  }
+  return url;
+}
+
+function onTimeoutChange() {
+  timeout = parseInt(document.getElementById("timeout").value);
+  localStorage.setItem('timeout', timeout);
 }

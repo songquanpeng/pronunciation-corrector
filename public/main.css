@@ -64,11 +64,11 @@ code {
 }
 
 .shadow {
-    box-shadow: 0 0.5em 1em -0.125em rgba(10,10,10,.1), 0 0 0 1px rgba(10,10,10,.02);
+    box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, .1), 0 0 0 1px rgba(10, 10, 10, .02);
 }
 
 .nav-shadow {
-    box-shadow: 0 2px 3px rgba(26,26,26,.1);
+    box-shadow: 0 2px 3px rgba(26, 26, 26, .1);
 }
 
 .box .article {
@@ -147,6 +147,7 @@ img {
 .article h5 {
     font-size: 1.1em;
 }
+
 .article h6 {
     font-size: 1em;
     font-weight: bold
@@ -216,7 +217,7 @@ img {
     padding: .065em .4em;
 }
 
-.article .copyright{
+.article .copyright {
     display: none;
 }
 
@@ -257,4 +258,33 @@ span.line {
 
 #currentWord {
     font-size: x-large;
+}
+
+#currentWordContainer {
+    height: 80%;
+    max-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media screen and (max-width: 768px) {
+    #currentWordContainer  {
+        max-height: 150px;
+    }
+}
+
+.panel-item {
+    margin-right: 16px;
+}
+
+@media screen and (max-width: 768px) {
+    .panel-item {
+        margin-right: 0;
+        max-width: 48%;
+    }
+
+    .panel-item > span > input {
+        width: 50px!important;
+    }
 }
