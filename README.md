@@ -19,3 +19,7 @@
   "common-500": "最常用的 500 个英语单词"
 }
 ```
+
+## 其他
+1. 由 [jingjingxyk](https://github.com/jingjingxyk/) 开发的[配套 Chrome 扩展](https://github.com/jingjingxyk/pronunciation-corrector-chromium-extension)。
+2. 《中国程序员容易发音错误的单词》[词库来源](https://github.com/shimohq/chinese-programmer-wrong-pronunciation)。
