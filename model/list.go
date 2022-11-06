@@ -3,7 +3,7 @@ package model
 type List struct {
 	Id          int    `json:"id"`
 	OwnerId     int    `json:"owner_id" gorm:"index"`
-	Link        string `json:"link" gorm:"index"`
+	Name        string `json:"name" gorm:"index"`
 	Description string `json:"description"`
 	Status      int    `json:"status" gorm:"index"` // 0 disabled, 1 private, 2 public
 	Words       []byte `json:"words" gorm:"type:blob"`
