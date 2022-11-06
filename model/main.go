@@ -59,6 +59,14 @@ func InitDB() (err error) {
 		if err != nil {
 			return err
 		}
+		err = db.AutoMigrate(&Word{})
+		if err != nil {
+			return err
+		}
+		err = db.AutoMigrate(&List{})
+		if err != nil {
+			return err
+		}
 		err = db.AutoMigrate(&Option{})
 		if err != nil {
 			return err
