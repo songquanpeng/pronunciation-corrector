@@ -11,9 +11,6 @@
   <a href="https://github.com/songquanpeng/pronunciation-corrector/releases/latest">
     <img src="https://img.shields.io/github/downloads/songquanpeng/pronunciation-corrector/total?color=brightgreen&include_prereleases" alt="release">
   </a>
-  <a href="https://goreportcard.com/report/github.com/songquanpeng/go-file">
-    <img src="https://goreportcard.com/badge/github.com/songquanpeng/pronunciation-corrector" alt="GoReportCard">
-  </a>
 </p>
 
 即刻开始练习：https://corrector.justsong.cn/
