@@ -59,5 +59,13 @@ func SetApiRouter(router *gin.Engine) {
 			fileRoute.POST("/", middleware.UserAuth(), middleware.UploadRateLimit(), controller.UploadFile)
 			fileRoute.DELETE("/:id", middleware.UserAuth(), controller.DeleteFile)
 		}
+		listRoute := apiRouter.Group("/list")
+		{
+			listRoute.GET("/available", controller.GetAvailableList)
+		}
+		wordRoute := apiRouter.Group("/word")
+		{
+			wordRoute.GET("/", controller.GetWords)
+		}
 	}
 }

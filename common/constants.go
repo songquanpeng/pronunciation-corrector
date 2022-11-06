@@ -21,6 +21,7 @@ var OptionMap map[string]string
 var OptionMapRWMutex sync.RWMutex
 
 var ItemsPerPage = 10
+var MaxWordsPerRequest = 10000
 
 var PasswordLoginEnabled = true
 var PasswordRegisterEnabled = true

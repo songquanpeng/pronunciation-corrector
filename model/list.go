@@ -9,6 +9,17 @@ type List struct {
 	Words       []byte `json:"words" gorm:"type:blob"`
 }
 
+const (
+	ListStatusDisabled = 0
+	ListStatusPrivate  = 1
+	ListStatusPublic   = 2
+)
+
+func GetAvailableLists(userId int) (lists []*List, err error) {
+	err = DB.Where("owner_id = ? or status = 2", userId).Find(&lists).Error
+	return lists, err
+}
+
 func (list *List) Insert() error {
 	var err error
 	err = DB.Create(list).Error

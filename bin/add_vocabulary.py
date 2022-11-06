@@ -43,9 +43,9 @@ def main(args):
     for idx, word in words:
         word2idx[word] = idx
     size = len(word2idx) + 1
-    for name, (words, description) in vocabularies.items():
+    for name, (local_words, description) in vocabularies.items():
         arr = np.zeros(size, dtype=bool)
-        for word in words:
+        for word in local_words:
             arr[word2idx[word]] = True
         byte_arr = np.packbits(arr, axis=None).tobytes()
         cursor.execute("INSERT OR IGNORE INTO lists (owner_id, name, description, status, words) VALUES(?, ?, ?, ?, ?)",
