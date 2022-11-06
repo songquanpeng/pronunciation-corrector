@@ -1,2 +1,6 @@
-*.pyc
 .idea
+.vscode
+upload
+*.exe
+*.db
+build
