@@ -1,0 +1,40 @@
+
+.box {
+    background-color: #fff;
+    border-radius: 6px;
+    box-shadow: 0 0.5em 1em -0.125em rgb(10 10 10 / 10%), 0 0 0 1px rgb(10 10 10 / 2%);
+    color: #4a4a4a;
+    display: block;
+    padding: 1.25rem;
+}
+
+.main-container {
+    border: none!important;
+    border-radius: 6px!important;
+    box-shadow: 0 0.5em 1em -0.125em rgb(10 10 10 / 10%), 0 0 0 1px rgb(10 10 10 / 2%)!important;
+}
+
+.word-container {
+    height: 80%;
+    min-height: 250px;
+    max-height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.word {
+    font-size: x-large;
+    color: #4a4a4a;
+}
+
+.card-title {
+    font-weight: 700;
+    font-size: .92857143em;
+    color: rgba(0,0,0,.87);
+}
+
+label {
+    font-size: 1.1em!important;
+    margin-bottom: 12px!important;
+}

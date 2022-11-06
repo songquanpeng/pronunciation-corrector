@@ -9,7 +9,7 @@ import NotFound from './pages/NotFound';
 import Setting from './pages/Setting';
 import EditUser from './pages/User/EditUser';
 import AddUser from './pages/User/AddUser';
-import { API, showError } from './helpers';
+import { API, showError, showNotice } from './helpers';
 import PasswordResetForm from './components/PasswordResetForm';
 import GitHubOAuth from './components/GitHubOAuth';
 
@@ -28,7 +28,22 @@ function App() {
     }
   };
 
+  const displayNotice = async () => {
+    const res = await API.get('/api/notice');
+    const { success, message, data } = res.data;
+    if (success) {
+      let oldNotice = localStorage.getItem('notice');
+      if (data !== oldNotice && data !== '') {
+        showNotice(data);
+        localStorage.setItem('notice', data);
+      }
+    } else {
+      showError(message);
+    }
+  };
+
   useEffect(() => {
+    displayNotice().then();
     loadStatus().then();
   }, []);
 
