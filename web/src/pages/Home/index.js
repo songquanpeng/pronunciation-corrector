@@ -1,23 +1,55 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Form, Grid, Progress, Segment } from 'semantic-ui-react';
 import { API, showError } from '../../helpers';
 import './index.css';
 
 const Home = () => {
   const [loading, setLoading] = useState(true);
-  const [learning, setLearning] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const playingRef = useRef(playing);
+  playingRef.current = playing;
   const [words, setWords] = useState([]);
   const [list, setList] = useState([]);
+  const listRef = useRef(list);
+  listRef.current = list;
   const [lists, setLists] = useState([]);
   const [currentWordIdx, setCurrentWordIdx] = useState(0);
+  const currentWordIdxRef = useRef(currentWordIdx);
+  currentWordIdxRef.current = currentWordIdx;
+  const [percent, setPercent] = useState(0);
+  const percentRef = useRef(percent);
+  percentRef.current = percent;
+  const [currentWord, setCurrentWord] = useState({
+    id: 0,
+    text: '',
+    ipa: '',
+    explanation: '',
+  });
   const [currentListIdx, setCurrentListIdx] = useState(0);
+  const currentListIdxRef = useRef(currentListIdx);
+  currentListIdxRef.current = currentListIdx;
   const [currentSoundSrc, setCurrentSoundSrc] = useState('youdao');
+  const currentSoundSrcRef = useRef(currentSoundSrc);
+  currentSoundSrcRef.current = currentSoundSrc;
+  const [soundType, setSoundType] = useState(0);
+  const soundTypeRef = useRef(soundType);
+  soundTypeRef.current = soundType;
   const [setting, setSetting] = useState({
-    repeatNum: 1,
-    repeatInterval: 100,
+    repeatNumber: 1,
+    repeatInterval: 1000,
     playDelay: 0,
     timeout: 3000,
   });
+  const settingRef = useRef(setting);
+  settingRef.current = setting;
+  const [remainingRepeatNumber, setRemainingRepeatNumber] = useState(
+    setting.repeatNumber
+  );
+  const remainingRepeatNumberIdxRef = useRef(remainingRepeatNumber);
+  remainingRepeatNumberIdxRef.current = remainingRepeatNumber;
+  let player = document.getElementById('player');
+  let source = document.getElementById('source');
+  let skipTimeout;
 
   const loadAvailableLists = async () => {
     let lists = localStorage.getItem('lists');
@@ -65,11 +97,20 @@ const Home = () => {
     setLoading(true);
     await loadAvailableLists();
     await loadWords();
-    parseList(0);
-    setLoading(false);
   };
 
+  useEffect(() => {
+    parseList(0);
+    setLoading(false);
+  }, [lists]);
+
   const parseList = (idx) => {
+    console.log(
+      'parseList() called with idx',
+      idx,
+      'lists.length',
+      lists.length
+    );
     if (lists.length <= idx) return;
     let words = lists[idx].origin.words;
     let binaryWords = window.atob(words);
@@ -82,7 +123,9 @@ const Home = () => {
         }
       }
     }
+    console.log('setting list: ', list);
     setList(list);
+    setCurrentWordIdx(0);
   };
 
   const onListChange = async (e, data) => {
@@ -90,12 +133,112 @@ const Home = () => {
     parseList(data.value);
   };
 
+  const getAudioURL = (text) => {
+    let url;
+    let typeStr;
+    switch (currentSoundSrcRef.current) {
+      case 'google':
+        typeStr = soundTypeRef.current === 0 ? 'us' : 'gb';
+        text = text.toLowerCase();
+        url = `https://ssl.gstatic.com/dictionary/static/sounds/oxford/${text}--_${typeStr}_1.mp3`;
+        break;
+      default:
+        url = `https://dict.youdao.com/dictvoice?type=${soundTypeRef.current}&audio=${text}`;
+        break;
+    }
+    return url;
+  };
+
+  const play = async () => {
+    console.log('play() called, playing is', playingRef.current);
+    if (!playingRef.current) return;
+
+    // load word
+    let currentWord = words[listRef.current[currentWordIdxRef.current] - 1];
+    console.log(currentWordIdxRef.current, currentWord);
+    setCurrentWord(currentWord);
+
+    if (
+      remainingRepeatNumberIdxRef.current === settingRef.current.repeatNumber
+    ) {
+      let audioURL = getAudioURL(currentWord.text);
+      source.setAttribute('src', audioURL);
+      await player.load();
+      await new Promise((resolve) =>
+        setTimeout(resolve, settingRef.current.playDelay)
+      );
+    }
+    setRemainingRepeatNumber(remainingRepeatNumberIdxRef.current - 1);
+    skipTimeout = setTimeout(playEnded, settingRef.current.timeout);
+    await player.play(); // if the player failed to load the audio, it will block here.
+  };
+
+  const playEnded = async () => {
+    console.log(
+      'playEnded() called, remainingRepeatNumber ',
+      remainingRepeatNumberIdxRef.current
+    );
+    if (skipTimeout) clearTimeout(skipTimeout);
+    if (remainingRepeatNumberIdxRef.current <= 0) {
+      setRemainingRepeatNumber(settingRef.current.repeatNumber);
+      if (currentWordIdxRef.current === words.length - 1) {
+        console.log('reset currentWordIdx to 0');
+        setCurrentWordIdx(0);
+      } else {
+        console.log(
+          'increase currentWordIdx to',
+          currentWordIdxRef.current + 1
+        );
+        setCurrentWordIdx(currentWordIdxRef.current + 1);
+      }
+      setPercent(Math.ceil((100 * currentWordIdxRef.current) / words.length));
+    }
+    if (playingRef.current) {
+      setTimeout(play, settingRef.current.repeatInterval);
+    }
+  };
+
+  const onPlayBtnClicked = () => {
+    if (words.length === 0 || lists.length === 0 || list.length === 0) {
+      if (words.length === 0) {
+        showError('无法开始播放，words 长度为 0！');
+      }
+      if (lists.length === 0) {
+        showError('无法开始播放，lists 长度为 0！');
+      }
+      if (list.length === 0) {
+        showError('无法开始播放，list 长度为 0！');
+      }
+      return;
+    }
+    setPlaying((v) => !v);
+  };
+
+  useEffect(() => {
+    if (playing) {
+      play().then();
+    }
+  }, [playing]);
+
   useEffect(() => {
     loadData().then();
   }, []);
 
+  const handleSettingChange = (e, { name, value }) => {
+    setSetting((setting) => ({ ...setting, [name]: value }));
+  };
+
+  const backward = () => {
+    setCurrentWordIdx(Math.max(0, currentWordIdx - 2));
+  };
+
+  const reset = () => {
+    setCurrentWordIdx(0);
+  };
+
   return (
     <Segment
+      loading={loading}
       style={{
         maxWidth: '930px',
         margin: 'auto',
@@ -104,6 +247,9 @@ const Home = () => {
       }}
       className={'main-container'}
     >
+      <audio controls style={{ display: 'none' }} id="player">
+        <source src="" type="audio/mpeg" id="source" />
+      </audio>
       <Grid columns={2} stackable>
         <Grid.Column style={{ padding: '1.25rem' }}>
           <label className="card-title">当前单词</label>
@@ -111,16 +257,16 @@ const Home = () => {
             <p className={'word'}>
               {loading
                 ? '加载中，请稍后 ...'
-                : learning
-                ? words[list[currentWordIdx] - 1].text
+                : playing
+                ? currentWord.text
                 : '请点击播放按钮 ...'}
             </p>
           </div>
           <Progress
             size={'small'}
-            value={currentWordIdx}
-            total={words.length}
+            percent={percent}
             color="green"
+            progress="percent"
           />
         </Grid.Column>
         <Grid.Column style={{ padding: '1.25rem' }}>
@@ -138,7 +284,7 @@ const Home = () => {
               options={[
                 { key: 'youdao', text: '有道', value: 'youdao' },
                 { key: 'google', text: 'Google', value: 'google' },
-                { key: 'baidu', text: '百度', value: 'baidu' },
+                // { key: 'baidu', text: '百度', value: 'baidu' },
               ]}
               value={currentSoundSrc}
               onChange={(e, data) => {
@@ -152,7 +298,9 @@ const Home = () => {
                 type="number"
                 min={0}
                 placeholder={1}
-                value={setting.repeatNum}
+                name="repeatNumber"
+                value={setting.repeatNumber}
+                onChange={handleSettingChange}
               />
               <Form.Input
                 fluid
@@ -161,7 +309,9 @@ const Home = () => {
                 placeholder={100}
                 min={0}
                 step={10}
+                name="repeatInterval"
                 value={setting.repeatInterval}
+                onChange={handleSettingChange}
               />
               <Form.Input
                 fluid
@@ -170,7 +320,9 @@ const Home = () => {
                 placeholder={0}
                 min={0}
                 step={100}
+                name="playDelay"
                 value={setting.playDelay}
+                onChange={handleSettingChange}
               />
               <Form.Input
                 fluid
@@ -179,7 +331,9 @@ const Home = () => {
                 placeholder={3000}
                 min={1000}
                 step={100}
+                name="timeout"
                 value={setting.timeout}
+                onChange={handleSettingChange}
               />
             </Form.Group>
             <Form.Group>
@@ -192,6 +346,7 @@ const Home = () => {
                   padding: '12px 16px',
                   marginRight: 0,
                 }}
+                onClick={reset}
               >
                 重置
               </Form.Button>
@@ -204,6 +359,7 @@ const Home = () => {
                   padding: '12px 16px',
                   marginRight: 0,
                 }}
+                onClick={backward}
               >
                 后退
               </Form.Button>
@@ -216,8 +372,11 @@ const Home = () => {
                   padding: '12px 16px',
                   marginRight: 0,
                 }}
+                onClick={() => {
+                  setSoundType((v) => (v + 1) % 2);
+                }}
               >
-                美音
+                {soundType === 0 ? '美音' : '英音'}
               </Form.Button>
               <Form.Button
                 size="large"
@@ -228,11 +387,9 @@ const Home = () => {
                   padding: '12px 16px',
                   marginRight: 0,
                 }}
-                onClick={() => {
-                  setLearning(!learning);
-                }}
+                onClick={onPlayBtnClicked}
               >
-                {learning ? '暂停' : '播放'}
+                {playing ? '暂停' : '播放'}
               </Form.Button>
             </Form.Group>
           </Form>
