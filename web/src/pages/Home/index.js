@@ -181,7 +181,7 @@ const Home = () => {
     if (skipTimeout) clearTimeout(skipTimeout);
     if (remainingRepeatNumberIdxRef.current <= 0) {
       setRemainingRepeatNumber(settingRef.current.repeatNumber);
-      if (currentWordIdxRef.current === words.length - 1) {
+      if (currentWordIdxRef.current === listRef.current.length - 1) {
         console.log('reset currentWordIdx to 0');
         setCurrentWordIdx(0);
       } else {
@@ -191,7 +191,9 @@ const Home = () => {
         );
         setCurrentWordIdx(currentWordIdxRef.current + 1);
       }
-      setPercent(Math.ceil((100 * currentWordIdxRef.current) / words.length));
+      setPercent(
+        Math.ceil((100 * currentWordIdxRef.current) / listRef.current.length)
+      );
     }
     if (playingRef.current) {
       setTimeout(play, settingRef.current.repeatInterval);
